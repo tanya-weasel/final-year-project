@@ -4,3 +4,4 @@ try.py
 
 venv/
 __pycache__/
+*.pyc
