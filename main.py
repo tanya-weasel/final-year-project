@@ -21,7 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from langchain.document_loaders import TextLoader, WebBaseLoader
+from langchain.document_loaders import WebBaseLoader # , TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import CohereEmbeddings
 from langchain.vectorstores import Qdrant
@@ -34,7 +34,7 @@ from PyPDF2 import PdfReader
 from io import BytesIO
 
 # First endpoint
-collections = {}
+vector_db_now = {}
 user = "default"
 
 @app.get("/")
@@ -45,21 +45,11 @@ def read_root():
 def login(username:str, pwd:str):
     # check for this somewhere
     # set user to be username
+    # set vector_db to have all current filenames and pointers
     return {"message":"ok or not"} 
 
 # Second endpoint
-@app.post("/upload") # called on clicking upload button
-# def upload_item(doc, docname: str):
-#     loader = TextLoader(doc) # or an address?
-#     documents = loader.load()
-#     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
-#     docs = text_splitter.split_documents(documents)
-
-#     embeddings = CohereEmbeddings(model="embed-english-light-v2.0", cohere_api_key="impWdoD827eyrqGvUBxLppEWxNr0DO3gMBl2C3iv")
-#     collection_name = f"{user}_{docname}"
-#     vectorstore = Qdrant.from_documents(docs, embeddings, location=":memory:", collection_name=collection_name)
-#     # change this to on premise with Docker
-#     collections[collection_name] = vectorstore
+@app.post("/upload") 
 async def upload_pdf(file: UploadFile = File(...)):
     # Check if the uploaded file is a PDF
     if file.content_type != "application/pdf":
@@ -80,13 +70,25 @@ async def upload_pdf(file: UploadFile = File(...)):
     embeddings = CohereEmbeddings(model="embed-english-light-v2.0", cohere_api_key=api_keys.Cohere)
     collection_name = user # collection_name = f"{user}_{filename}"
     vectorstore = Qdrant.from_texts(docs, embeddings, location=":memory:", collection_name=collection_name)
+    # print(type(vectorstore))
+    vector_db_now["file"] = vectorstore
     # change this to on premise with Docker
     # You can now use the 'contents' variable to perform further processing on the PDF file
-    collections[collection_name] = vectorstore
 
-# Third endpoint
+@app.get("/url")
+def upload_url(url: str):
+    # verify url is legit (how??)
+    loader = WebBaseLoader(url)
+    data = loader.load()
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
+    docs = text_splitter.split_documents(data)
+    embeddings = CohereEmbeddings(model="embed-english-light-v2.0", cohere_api_key=api_keys.Cohere)
+    collection_name = user
+    vectorstore = Qdrant.from_documents(docs, embeddings, location=":memory:", collection_name=collection_name)
+    vector_db_now["url"] = vectorstore
+
 @app.get("/ask")
-def get_answer(question: str): # docname:str
+def get_answer(question: str, tab: int): # tab for file or url
     llm = ""
     try:
         llm = JinaChat(jinachat_api_key=api_keys.Jina)
@@ -95,8 +97,11 @@ def get_answer(question: str): # docname:str
     prompt = hub.pull("rlm/rag-prompt")
 
     collection_name = user  # collection_name = f"{user}_{docname}"
-    retriever = collections[collection_name].as_retriever(search_type="similarity", search_kwargs={"k": 4})
-
+    if tab == 1:
+        retriever = vector_db_now["file"].as_retriever(search_type="similarity", search_kwargs={"k": 4})
+    else:
+        retriever = vector_db_now["url"].as_retriever(search_type="similarity", search_kwargs={"k": 4})
+    
     def format_docs(docs):
         #return "\n\n".join(doc.page_content for doc in docs)
         try:

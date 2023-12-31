@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 
-const AskQuestion = () => {
+const AskQuestion = (props) => {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
 
   const handleAsk = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/ask?question=${encodeURIComponent(question)}`);
+      const response = await fetch(`http://localhost:8000/ask?question=${encodeURIComponent(question)}&tab=${encodeURIComponent(props.tab)}`);
       const data = await response.json();
       console.log(data);
-      setAnswer(data.answer); // Adjust this based on the actual response structure
+      setAnswer(data.answer);
     } catch (error) {
       console.error('Error fetching answer:', error);
     }

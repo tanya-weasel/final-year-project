@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 // import { fetchMessage } from './Api';
 import FileUpload from './components/upload';
 import AskQuestion from './components/ask';
+import AddUrl from './components/url';
 
 function App() {
     // const [message, setMessage] = useState('');
@@ -23,11 +24,12 @@ function App() {
 
     //     fetchData();
     // }, []);
-
+    let tab = 0;
     return (
         <div className="App">
             <FileUpload/>
-            <AskQuestion/>
+            <AddUrl/>
+            <AskQuestion tab={tab}/>
         </div>
     );
 }
