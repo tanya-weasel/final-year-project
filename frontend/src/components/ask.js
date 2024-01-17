@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button, Input } from '@mui/material';
 
 const AskQuestion = (props) => {
   const [question, setQuestion] = useState('');
@@ -6,6 +7,7 @@ const AskQuestion = (props) => {
 
   const handleAsk = async () => {
     try {
+      setAnswer("generating...");
       const response = await fetch(`http://localhost:8000/ask?question=${encodeURIComponent(question)}&tab=${encodeURIComponent(props.tab)}`);
       const data = await response.json();
       console.log(data);
@@ -18,18 +20,18 @@ const AskQuestion = (props) => {
   return (
     <div>
       <div>
-        <label>Question:</label>
-        <input
+        <label><strong>Question: </strong></label>
+        <Input
           type="text"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
+          margin="dense"
         />
+
+        <Button variant="contained" size="small" disableElevation onClick={handleAsk}>Ask</Button>
       </div>
       <div>
-        <button onClick={handleAsk}>Ask</button>
-      </div>
-      <div>
-        <label>Answer:</label>
+        <label><strong>Answer: </strong></label>
         <p>{answer}</p>
       </div>
     </div>

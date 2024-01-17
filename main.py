@@ -97,10 +97,10 @@ def get_answer(question: str, tab: int): # tab for file or url
     prompt = hub.pull("rlm/rag-prompt")
 
     collection_name = user  # collection_name = f"{user}_{docname}"
-    if tab == 1:
-        retriever = vector_db_now["file"].as_retriever(search_type="similarity", search_kwargs={"k": 4})
+    if tab == 0:
+        retriever = vector_db_now["file"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
     else:
-        retriever = vector_db_now["url"].as_retriever(search_type="similarity", search_kwargs={"k": 4})
+        retriever = vector_db_now["url"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
     
     def format_docs(docs):
         #return "\n\n".join(doc.page_content for doc in docs)
@@ -120,6 +120,6 @@ def get_answer(question: str, tab: int): # tab for file or url
     try:
         answer = rag_chain.invoke(question)
     except:
-        answer = "nooo"
+        answer = "Error during generation"
     print(answer)
     return JSONResponse(content={"answer": answer}, status_code=200)

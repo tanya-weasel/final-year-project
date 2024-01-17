@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button, Input } from '@mui/material';
 
 const AddUrl = () => {
   const [url_str, setUrl_str] = useState('');
@@ -9,6 +10,7 @@ const AddUrl = () => {
       const response = await fetch(`http://localhost:8000/url?url=${encodeURIComponent(url_str)}`);
       const data = await response.json();
       console.log(data);
+      console.log("url added");
       //setAnswer(data.answer); // Adjust this based on the actual response structure
     } catch (error) {
       console.error('Error fetching answer:', error);
@@ -18,7 +20,7 @@ const AddUrl = () => {
   return (
     <div>
       <div>
-        <label>Add url</label>
+        <label>URL </label>
         <input
           type="text"
           value={url_str}
@@ -26,7 +28,7 @@ const AddUrl = () => {
         />
       </div>
       <div>
-        <button onClick={handleAdd}>Add</button>
+        <Button variant="outlined" onClick={handleAdd}>Add</Button>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button, InputLabel, Input, TextField } from '@mui/material';
 
 const FileUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -19,7 +20,7 @@ const FileUpload = () => {
       .then(response => response.json())
       .then(data => {
         console.log('File uploaded successfully!', data);
-        // Handle the response as needed
+        // alert file uploaded
       })
       .catch(error => {
         console.error('Error uploading file:', error);
@@ -32,8 +33,30 @@ const FileUpload = () => {
 
   return (
     <div>
-      <input type="file" onChange={handleFileChange} />
-      <button onClick={handleUpload}>Upload</button>
+      <Input type="file" color="primary" onChange={handleFileChange} />
+      <Button variant="outlined" size="small" disableElevation onClick={handleUpload}>Upload</Button>
+      
+      {/* <div>
+      <InputLabel htmlFor="file-upload" style={{ marginBottom: '8px' }}>
+        Upload File
+      </InputLabel>
+      <Input
+        type="file"
+        id="file-upload"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+      <Button
+        variant="contained"
+        color="primary"
+        component="label"
+        htmlFor="file-upload"
+        onClick={handleUpload}
+      >
+        Upload
+      </Button>
+    </div> */}
+
     </div>
   );
 };
