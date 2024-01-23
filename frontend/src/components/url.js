@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Input } from '@mui/material';
+import { Button, Input, Card, CardContent } from '@mui/material';
 
 const AddUrl = () => {
   const [url_str, setUrl_str] = useState('');
@@ -18,19 +18,21 @@ const AddUrl = () => {
   };
 
   return (
-    <div>
-      <div>
-        <label>URL </label>
-        <input
-          type="text"
-          value={url_str}
-          onChange={(e) => setUrl_str(e.target.value)}
-        />
-      </div>
-      <div>
-        <Button variant="outlined" onClick={handleAdd}>Add</Button>
-      </div>
-    </div>
+    <Card sx={{ maxWidth: '50vh', maxHeight: '80vh' }}>
+      <CardContent>
+        <div>
+          <label>URL </label>
+          <input
+            type="text"
+            value={url_str}
+            onChange={(e) => setUrl_str(e.target.value)}
+          />
+        </div>
+        <div>
+          <Button variant="outlined" onClick={handleAdd}>Add</Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

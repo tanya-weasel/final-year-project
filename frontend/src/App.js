@@ -87,7 +87,6 @@ function App() {
                 </CustomTabPanel>
                 
             </Box>
-            
             <AskQuestion tab={value}/>
         </div>
     );

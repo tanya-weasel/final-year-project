@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Input } from '@mui/material';
+import { Button, Input, Card, CardContent, TextareaAutosize } from '@mui/material';
 
 const AskQuestion = (props) => {
   const [question, setQuestion] = useState('');
@@ -18,23 +18,25 @@ const AskQuestion = (props) => {
   };
 
   return (
-    <div>
-      <div>
-        <label><strong>Question: </strong></label>
-        <Input
-          type="text"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          margin="dense"
-        />
+    <Card sx={{ maxWidth: '60vh' }}>
+      <CardContent>
+        <div>
+          {/* <label><strong>Question: </strong></label> */}
+          <TextareaAutosize
+            placeholder="Type your question"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            //margin="dense"
+          />
 
-        <Button variant="contained" size="small" disableElevation onClick={handleAsk}>Ask</Button>
-      </div>
-      <div>
-        <label><strong>Answer: </strong></label>
-        <p>{answer}</p>
-      </div>
-    </div>
+          <Button variant="contained" size="small" disableElevation onClick={handleAsk}
+          sx={{ marginLeft: '10px' }}>Ask</Button>
+        </div>
+        <div>
+          <p><strong>Answer: </strong>{answer}</p>
+        </div>
+      </CardContent>  
+    </Card>
   );
 };
 

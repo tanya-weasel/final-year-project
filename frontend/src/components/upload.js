@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Button, InputLabel, Input, TextField } from '@mui/material';
+import { Button, InputLabel, Input, TextField, Card, CardContent } from '@mui/material';
 
 const FileUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -32,33 +33,25 @@ const FileUpload = () => {
   };
 
   return (
-    <div>
-      <Input type="file" color="primary" onChange={handleFileChange} />
-      <Button variant="outlined" size="small" disableElevation onClick={handleUpload}>Upload</Button>
-      
-      {/* <div>
-      <InputLabel htmlFor="file-upload" style={{ marginBottom: '8px' }}>
-        Upload File
-      </InputLabel>
-      <Input
-        type="file"
-        id="file-upload"
-        style={{ display: 'none' }}
-        onChange={handleFileChange}
-      />
-      <Button
-        variant="contained"
-        color="primary"
-        component="label"
-        htmlFor="file-upload"
-        onClick={handleUpload}
-      >
-        Upload
-      </Button>
-    </div> */}
-
-    </div>
+    <Card sx={{ maxWidth: '50vh', maxHeight: '80vh' }}>
+      <CardContent> 
+        <div>
+          <input
+            // sx={{ maxWidth: 280, maxHeight: 100 }}
+            id="contained-button-file"
+            multiple
+            type="file"
+            onChange={handleFileChange}
+          />
+            <Button variant="outlined" color="primary" component="span" size="small" onClick={handleUpload}>
+              Upload
+            </Button>
+          
+        </div> 
+      </CardContent>
+    </Card>
   );
 };
 
 export default FileUpload;
+
