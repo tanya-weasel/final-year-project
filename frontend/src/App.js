@@ -8,8 +8,9 @@ import React, { useState, useEffect } from 'react';
 import FileUpload from './components/upload';
 import AskQuestion from './components/ask';
 import AddUrl from './components/url';
+import ChatInterface from './components/chat';
 
-import {Tabs, Tab, Typography, Box} from '@mui/material';
+import {Tabs, Tab, Typography, Box, FormControl, InputLabel, Select, MenuItem} from '@mui/material';
 import PropTypes from 'prop-types';
 
 function App() {
@@ -67,6 +68,15 @@ function App() {
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+
+    
+    // Initialize state to hold the selected value
+    const [selectedLLM, setSelectedLLM] = useState('');
+  
+    // Function to handle dropdown value change
+    const handleDropdownChange = (event) => {
+      setSelectedLLM(event.target.value);
+    } 
       
     return (
         <div className="App">
@@ -78,16 +88,40 @@ function App() {
                         <Tab label="Upload file" {...a11yProps(0)} />
                         <Tab label="Enter url" {...a11yProps(1)} />
                     </Tabs>
+                    
+                    <Box sx={{ minWidth: 120, marginTop:5 }}>
+                      <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">LLM</InputLabel>
+                        <Select
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          value={selectedLLM}
+                          label="LLM"
+                          onChange={handleDropdownChange}
+                        >
+                          <MenuItem value={"JinaChat"}>JinaChat</MenuItem>
+                          <MenuItem value={"Cohere"}>Cohere</MenuItem>
+                          {/* <MenuItem value={30}>Thirty</MenuItem> */}
+                        </Select>
+                      </FormControl>
+                    </Box>
+
                 </Box>
                 <CustomTabPanel value={value} index={0}>
+                   
                     <FileUpload/>
+                    <ChatInterface tab={value} llmName={selectedLLM}/>
+
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={1}>
+                    
                     <AddUrl/>
+                    <ChatInterface tab={value} llmName={selectedLLM}/>
+
                 </CustomTabPanel>
                 
             </Box>
-            <AskQuestion tab={value}/>
+            {/* <AskQuestion tab={value}/> */}
         </div>
     );
 }
