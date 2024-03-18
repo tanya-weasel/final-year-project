@@ -103,6 +103,7 @@ function App() {
                         >
                           <MenuItem value={"JinaChat"}>JinaChat</MenuItem>
                           <MenuItem value={"Cohere"}>Cohere</MenuItem>
+                          <MenuItem value={"OpenAI"}>OpenAI</MenuItem>
                           {/* <MenuItem value={30}>Thirty</MenuItem> */}
                         </Select>
                       </FormControl>
