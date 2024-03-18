@@ -1,83 +1,46 @@
 
-// import React, { useState } from 'react';
-// import { Box } from '@mui/material';
-
-// const ChatInterface = (props) => {
-//   const [messages, setMessages] = useState([]);
-//   const [inputValue, setInputValue] = useState('');
-
-//   const handleMessageSubmit = async (e) => {
-//     e.preventDefault();
-//     if (!inputValue.trim()) return;
-
-//     const response = await fetch(`http://localhost:8000/ask?question=${encodeURIComponent(inputValue)}&tab=${encodeURIComponent(props.tab)}`);
-//     const data = await response.json();
-//     console.log(data);
-    
-//     // response from the chatbot
-//     setMessages([
-//     ...messages,
-//     { sender: 'user', text: inputValue }, { sender: 'bot', text: data.answer },
-//     ]);
-
-//     setInputValue('');
-//   };
-
-//   return (
-//     <div className="chat-interface">
-//       <Box className="chat-window">
-//         {messages.map((message, index) => (
-//           <Box key={index} className={`message ${message.sender}`} 
-//           sx={{ borderColor: '#000099', borderRadius: '2', backgroundColor: 'pink', borderWidth:'5'}}>
-//             {message.text}
-//           </Box>
-//         ))}
-//       </Box>
-//       <form onSubmit={handleMessageSubmit} className="message-input-form">
-//         <input
-//           type="text"
-//           placeholder="Type your question..."
-//           value={inputValue}
-//           onChange={(e) => setInputValue(e.target.value)}
-//         />
-//         <button type="submit">Send</button>
-//       </form>
-//     </div>
-//   );
-// };
-// export default ChatInterface;
-
-
 import React, { useState } from 'react';
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput } from '@chatscope/chat-ui-kit-react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css'; // Import CSS
+import { Alert } from '@mui/material';
 
 const ChatInterface = (props) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
 
   const handleMessageSubmit = async (text) => {
-    //e.preventDefault();
-    //console.log(inputValue);
-    console.log(text);
     if (!text.trim()) return;
 
-    const response = await fetch(`http://localhost:8000/ask?question=${encodeURIComponent(text)}&tab=${encodeURIComponent(props.tab)}&llmName=${encodeURIComponent(props.llmName)}`);
-    const data = await response.json();
-    console.log(data);
+    setShowAlert(true);
+
+    try {
+      const response = await fetch(`http://localhost:8000/ask?question=${encodeURIComponent(text)}&tab=${encodeURIComponent(props.tab)}&llmName=${encodeURIComponent(props.llmName)}`);
+      const data = await response.json();
+      console.log(data);
     
-    // Update the chat window with user's message and bot's response
-    setMessages([
-      ...messages,
-      { sender: 'user', text: text },
-      { sender: 'bot', text: data.answer },
-    ]);
+      // Update the chat window with user's message and bot's response
+      setMessages([
+        ...messages,
+        { sender: 'user', text: text },
+        { sender: 'bot', text: data.answer },
+      ]);
+    } catch (error) {
+      console.error('Error fetching answer:', error);
+    } finally {
+      setShowAlert(false);
+    }
 
     setInputValue('');
   };
 
   return (
-    <div style={{ position: 'relative',  }}>
+    <div style={{ position: 'relative' }}>
+      {showAlert && (
+            <Alert severity="info" sx={{ position: 'absolute', bottom: '5px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999 }}>
+              Generating answer...
+            </Alert>
+          )}
       <MainContainer>
         <ChatContainer>
           <MessageList>
@@ -85,7 +48,6 @@ const ChatInterface = (props) => {
               <Message
                 key={index}
                 model={{
-                // different coulurs and sides for bot and user  
                   message: message.text,
                   sentTime: 'just now',
                   sender: message.sender,
@@ -102,6 +64,7 @@ const ChatInterface = (props) => {
               handleMessageSubmit(text);
             }}
           />
+          
         </ChatContainer>
       </MainContainer>
     </div>
@@ -109,5 +72,3 @@ const ChatInterface = (props) => {
 };
 
 export default ChatInterface;
-
-

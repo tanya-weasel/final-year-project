@@ -6,7 +6,7 @@ import './App.css';
 import React, { useState, useEffect } from 'react';
 // import { fetchMessage } from './Api';
 import FileUpload from './components/upload';
-import AskQuestion from './components/ask';
+import AddText from './components/paste';
 import AddUrl from './components/url';
 import ChatInterface from './components/chat';
 
@@ -87,6 +87,8 @@ function App() {
                     <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                         <Tab label="Upload file" {...a11yProps(0)} />
                         <Tab label="Enter url" {...a11yProps(1)} />
+                        <Tab label="Input text" {...a11yProps(2)} />
+
                     </Tabs>
                     
                     <Box sx={{ minWidth: 120, marginTop:5 }}>
@@ -116,6 +118,12 @@ function App() {
                 <CustomTabPanel value={value} index={1}>
                     
                     <AddUrl/>
+                    <ChatInterface tab={value} llmName={selectedLLM}/>
+
+                </CustomTabPanel>
+                <CustomTabPanel value={value} index={2}>
+                    
+                    <AddText/>
                     <ChatInterface tab={value} llmName={selectedLLM}/>
 
                 </CustomTabPanel>

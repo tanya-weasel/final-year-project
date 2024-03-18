@@ -44,7 +44,7 @@ const FileUpload = () => {
   };
 
   return (
-    <Card sx={{ maxWidth: '50vh', maxHeight: '80vh', marginBottom:'5vh' }}>
+    <Card sx={{ maxWidth: '50vh', minHeight: '10vh', maxHeight: '80vh', marginBottom:'5vh' }}>
       <CardContent> 
         <div>
           <input

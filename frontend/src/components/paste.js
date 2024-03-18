@@ -1,21 +1,21 @@
 
 import React, { useState } from 'react';
-import { Button, Input, Card, CardContent, Box, Snackbar } from '@mui/material';
+import { Button, TextareaAutosize, Card, CardContent, Box, Snackbar } from '@mui/material';
 
-const AddUrl = () => {
-  const [url_str, setUrl_str] = useState('');
+const AddText = () => {
+  const [text_str, setText_str] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const handleAdd = async () => {
     try {
-      setSnackbarMessage('URL adding...');
+      setSnackbarMessage('Text adding...');
       setOpenSnackbar(true);
-      const response = await fetch(`http://localhost:8000/url?url=${encodeURIComponent(url_str)}`);
+      const response = await fetch(`http://localhost:8000/paste?text_str=${encodeURIComponent(text_str)}`);
       const data = await response.json();
       console.log(data);
-      console.log("url added");
-      setSnackbarMessage('URL added successfully!');
+      console.log("text added");
+      setSnackbarMessage('Text added successfully!');
       setOpenSnackbar(true);
       //setAnswer(data.answer); // Adjust this based on the actual response structure
     } catch (error) {
@@ -32,12 +32,14 @@ const AddUrl = () => {
   return (
     <Card sx={{ maxWidth: '50vh', minHeight: '10vh', maxHeight: '80vh', marginBottom:'5vh' }}>
       <CardContent>
-        <Box>
-          <label>URL: </label>
-          <input
-            type="text"
-            value={url_str}
-            onChange={(e) => setUrl_str(e.target.value)}
+        <Box >
+          {/* <label>Your text: </label> */}
+          <TextareaAutosize
+            placeholder='Type or paste text' 
+            sx={{ marginTop:'5vh'}}
+            maxRows={10}
+            value={text_str}
+            onChange={(e) => setText_str(e.target.value)}
           />
           <Button sx={{ marginLeft:'5vh' }} variant="outlined" size="small" onClick={handleAdd}>Add</Button>
         </Box>
@@ -61,4 +63,4 @@ const AddUrl = () => {
   );
 };
 
-export default AddUrl;
+export default AddText;

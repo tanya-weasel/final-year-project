@@ -72,7 +72,7 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     embeddings = CohereEmbeddings(model="embed-english-light-v2.0", cohere_api_key=api_keys.Cohere)
     collection_name = user # collection_name = f"{user}_{filename}"
-    vectorstore = Qdrant.from_texts(docs, embeddings, location=":memory:", collection_name=collection_name)
+    vectorstore = Qdrant.from_texts([docs], embeddings, location=":memory:", collection_name=collection_name)
     # print(type(vectorstore))
     vector_db_now["file"] = vectorstore
     # change this to on premise with Docker
@@ -90,8 +90,20 @@ def upload_url(url: str):
     vectorstore = Qdrant.from_documents(docs, embeddings, location=":memory:", collection_name=collection_name)
     vector_db_now["url"] = vectorstore
 
+@app.get("/paste")
+def upload_url(text_str: str):
+    # verify url is legit (how??)
+    print("text_str=", text_str)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
+    docs = text_splitter.split_text(text_str)
+    embeddings = CohereEmbeddings(model="embed-english-light-v2.0", cohere_api_key=api_keys.Cohere)
+    collection_name = user
+    vectorstore = Qdrant.from_texts(docs, embeddings, location=":memory:", collection_name=collection_name)
+    vector_db_now["text"] = vectorstore
+
 @app.get("/ask")
 def get_answer(question: str, tab: int, llmName:str): # tab for file or url
+    answer = ""
     try:
         llm = ""
         if (llmName=="JinaChat"):
@@ -106,8 +118,10 @@ def get_answer(question: str, tab: int, llmName:str): # tab for file or url
             collection_name = user  # collection_name = f"{user}_{docname}"
             if tab == 0:
                 retriever = vector_db_now["file"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
-            else:
+            elif tab == 1:
                 retriever = vector_db_now["url"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
+            else:
+                retriever = vector_db_now["text"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
             
             def format_docs(docs):
                 #return "\n\n".join(doc.page_content for doc in docs)
@@ -133,8 +147,10 @@ def get_answer(question: str, tab: int, llmName:str): # tab for file or url
             # )
             if tab == 0:
                 retriever = vector_db_now["file"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
-            else:
+            elif tab == 1:
                 retriever = vector_db_now["url"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
+            else:
+                retriever = vector_db_now["text"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
             
             def format_docs(docs):
                 try:
@@ -147,6 +163,9 @@ def get_answer(question: str, tab: int, llmName:str): # tab for file or url
             print(context)
             message = [HumanMessage(content=f"You are a friendly and cheerful assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Answer in at most four sentences. Question: {question} Context: {context}")]
             answer = llm.invoke(message).content
+
+        else:
+            raise Exception("no llm specified")
 
 
     except Exception as ex: 
