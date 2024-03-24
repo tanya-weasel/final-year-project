@@ -65,7 +65,7 @@ async def upload_pdf(file: UploadFile = File(...)):
     print (filename)
     pdf_file = BytesIO(contents)
     pdf_reader = PdfReader(pdf_file)
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=0)
     text = ""
     for page in pdf_reader.pages:
         text += page.extract_text()
@@ -73,7 +73,7 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     embeddings = CohereEmbeddings(model="embed-english-light-v2.0", cohere_api_key=api_keys.Cohere)
     collection_name = user # collection_name = f"{user}_{filename}"
-    vectorstore = Qdrant.from_texts([docs], embeddings, location=":memory:", collection_name=collection_name)
+    vectorstore = Qdrant.from_texts(docs, embeddings, location=":memory:", collection_name=collection_name)
     # print(type(vectorstore))
     vector_db_now["file"] = vectorstore
     # change this to on premise with Docker
@@ -81,10 +81,9 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 @app.get("/url")
 def upload_url(url: str):
-    # verify url is legit (how??)
     loader = WebBaseLoader(url)
     data = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=0)
     docs = text_splitter.split_documents(data)
     embeddings = CohereEmbeddings(model="embed-english-light-v2.0", cohere_api_key=api_keys.Cohere)
     collection_name = user
@@ -93,9 +92,8 @@ def upload_url(url: str):
 
 @app.get("/paste")
 def upload_url(text_str: str):
-    # verify url is legit (how??)
     print("text_str=", text_str)
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=0)
     docs = text_splitter.split_text(text_str)
     embeddings = CohereEmbeddings(model="embed-english-light-v2.0", cohere_api_key=api_keys.Cohere)
     collection_name = user
@@ -108,22 +106,25 @@ def get_answer(question: str, tab: int, llmName:str): # tab for file or url
     try:
         llm = ""
         if (llmName=="JinaChat"):
-            llm = JinaChat(jinachat_api_key=api_keys.Jina)
+            llm = JinaChat(jinachat_api_key=api_keys.Jina, temperature=0.5)
             # try another one at least
             # prompt = hub.pull("rlm/rag-prompt")
             # print(prompt, type(prompt))
             prompt = ChatPromptTemplate (
-                input_variables=['question', 'context'], output_parser=None, partial_variables={}, messages=[HumanMessagePromptTemplate(prompt=PromptTemplate(input_variables=['question', 'context'], output_parser=None, partial_variables={}, template="You are a friendly and cheerful assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Keep the answer concise.\nQuestion: {question} \nContext: {context} \nAnswer:", template_format='f-string', validate_template=True), additional_kwargs={})]
+                input_variables=['question', 'context'], output_parser=None, partial_variables={}, messages=[HumanMessagePromptTemplate(prompt=PromptTemplate(input_variables=['question', 'context'], output_parser=None, partial_variables={}, template="You are a helpful assistant for question-answering tasks. Speak in a friendly tone. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Answer in at most four sentences. If the context contains first person text, assume it refers to a narrator.\nQuestion: {question} \nContext: {context} \nAnswer:", template_format='f-string', validate_template=True), additional_kwargs={})]
             )
             #print(prompt, type(prompt))
             collection_name = user  # collection_name = f"{user}_{docname}"
-            if tab == 0:
-                retriever = vector_db_now["file"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
-            elif tab == 1:
-                retriever = vector_db_now["url"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
-            else:
-                retriever = vector_db_now["text"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
-            
+            try:
+                if tab == 0:
+                    retriever = vector_db_now["file"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
+                elif tab == 1:
+                    retriever = vector_db_now["url"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
+                else:
+                    retriever = vector_db_now["text"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
+            except:
+                raise Exception("Please enter text before asking questions")
+
             def format_docs(docs):
                 #return "\n\n".join(doc.page_content for doc in docs)
                 try:
@@ -142,22 +143,25 @@ def get_answer(question: str, tab: int, llmName:str): # tab for file or url
             answer = rag_chain.invoke(question)
 
         elif (llmName == "OpenAI"):
-            llm = ChatOpenAI(openai_api_key=api_keys.OpenAI)
+            llm = ChatOpenAI(openai_api_key=api_keys.OpenAI, temperature=0.3)
             # try another one at least
             # prompt = hub.pull("rlm/rag-prompt")
             # print(prompt, type(prompt))
             prompt = ChatPromptTemplate (
-                input_variables=['question', 'context'], output_parser=None, partial_variables={}, messages=[HumanMessagePromptTemplate(prompt=PromptTemplate(input_variables=['question', 'context'], output_parser=None, partial_variables={}, template="You are a friendly and cheerful assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Keep the answer concise.\nQuestion: {question} \nContext: {context} \nAnswer:", template_format='f-string', validate_template=True), additional_kwargs={})]
+                input_variables=['question', 'context'], output_parser=None, partial_variables={}, messages=[HumanMessagePromptTemplate(prompt=PromptTemplate(input_variables=['question', 'context'], output_parser=None, partial_variables={}, template="You are a helpful assistant for question-answering tasks. Speak in a friendly tone. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Answer in at most four sentences. If the context contains first person text, assume it refers to a narrator.\nQuestion: {question} \nContext: {context} \nAnswer:", template_format='f-string', validate_template=True), additional_kwargs={})]
             )
             #print(prompt, type(prompt))
             collection_name = user  # collection_name = f"{user}_{docname}"
-            if tab == 0:
-                retriever = vector_db_now["file"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
-            elif tab == 1:
-                retriever = vector_db_now["url"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
-            else:
-                retriever = vector_db_now["text"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
-            
+            try:
+                if tab == 0:
+                    retriever = vector_db_now["file"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
+                elif tab == 1:
+                    retriever = vector_db_now["url"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
+                else:
+                    retriever = vector_db_now["text"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
+            except:
+                raise Exception("Please enter text before asking questions")
+
             def format_docs(docs):
                 #return "\n\n".join(doc.page_content for doc in docs)
                 try:
@@ -176,17 +180,20 @@ def get_answer(question: str, tab: int, llmName:str): # tab for file or url
             answer = rag_chain.invoke(question)
         
         elif (llmName=="Cohere"):
-            llm = ChatCohere(cohere_api_key=api_keys.Cohere, model="command", max_tokens=256, temperature=0.75)
+            llm = ChatCohere(cohere_api_key=api_keys.Cohere, model="command", max_tokens=256, temperature=0.1)
             # prompt = ChatPromptTemplate (
             #     input_variables=['question', 'context'], output_parser=None, partial_variables={}, messages=[HumanMessagePromptTemplate(prompt=PromptTemplate(input_variables=['question', 'context'], output_parser=None, partial_variables={}, template="You are a friendly and cheerful assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Keep the answer concise.\nQuestion: {question} \nContext: {context} \nAnswer:", template_format='f-string', validate_template=True), additional_kwargs={})]
             # )
-            if tab == 0:
-                retriever = vector_db_now["file"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
-            elif tab == 1:
-                retriever = vector_db_now["url"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
-            else:
-                retriever = vector_db_now["text"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
-            
+            try:
+                if tab == 0:
+                    retriever = vector_db_now["file"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
+                elif tab == 1:
+                    retriever = vector_db_now["url"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
+                else:
+                    retriever = vector_db_now["text"].as_retriever(search_type="similarity", search_kwargs={"k": 6})
+            except:
+                raise Exception("Please enter text before asking questions")
+
             def format_docs(docs):
                 try:
                     return "\n\n".join(doc.page_content for doc in docs)
@@ -196,15 +203,15 @@ def get_answer(question: str, tab: int, llmName:str): # tab for file or url
                 
             context = format_docs(retriever.get_relevant_documents(question))
             print(context)
-            message = [HumanMessage(content=f"You are a friendly and cheerful assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Answer in at most four sentences. Question: {question} Context: {context}")]
+            message = [HumanMessage(content=f"You are a helpful assistant for question-answering tasks. Speak in a friendly tone. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Answer in at most four sentences. If the context contains first person text, assume it refers to a narrator. \nQuestion: {question} \nContext: {context} \nAnswer:")]
             answer = llm.invoke(message).content
 
         else:
-            raise Exception("no llm specified")
+            raise Exception("no LLM specified")
 
 
     except Exception as ex: 
-        answer = "Error during generation"
+        answer = f"Oops! Error generating response: {ex}"
         print(ex)
 
     

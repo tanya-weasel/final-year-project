@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Button, InputLabel, Input, TextField, Card, CardContent, Snackbar } from '@mui/material';
+import { Button, InputLabel, Input, TextField, Card, CardContent, Snackbar, Tooltip } from '@mui/material';
 
 const FileUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -44,7 +43,7 @@ const FileUpload = () => {
   };
 
   return (
-    <Card sx={{ maxWidth: '50vh', minHeight: '10vh', maxHeight: '80vh', marginBottom:'5vh' }}>
+    <Card sx={{ maxWidth: '50vh', minHeight: '10vh', maxHeight: '80vh', marginBottom:'5vh', textAlign:'center' }}>
       <CardContent> 
         <div>
           <input
@@ -53,10 +52,11 @@ const FileUpload = () => {
             type="file"
             onChange={handleFileChange}
           />
+          <Tooltip title="Upload a pdf file">  
             <Button variant="outlined" color="primary" component="span" size="small" onClick={handleUpload}>
               Upload
             </Button>
-          
+          </Tooltip> 
         </div> 
         <Snackbar
           anchorOrigin={{

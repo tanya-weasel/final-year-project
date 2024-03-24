@@ -104,7 +104,7 @@ function App() {
                           <MenuItem value={"JinaChat"}>JinaChat</MenuItem>
                           <MenuItem value={"Cohere"}>Cohere</MenuItem>
                           <MenuItem value={"OpenAI"}>OpenAI</MenuItem>
-                          {/* <MenuItem value={30}>Thirty</MenuItem> */}
+                          
                         </Select>
                       </FormControl>
                     </Box>
@@ -136,3 +136,76 @@ function App() {
 }
 
 export default App;
+
+// import React, { useState, useEffect, useMemo } from 'react';
+// import './App.css';
+// // import { fetchMessage } from './Api';
+// import FileUpload from './components/upload';
+// import AddText from './components/paste';
+// import AddUrl from './components/url';
+// import ChatInterface from './components/chat';
+
+// import { Tabs, Tab, Typography, Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+// import PropTypes from 'prop-types';
+
+// function App() {
+//     // Initialize state to hold the selected value
+//     const [selectedLLM, setSelectedLLM] = useState('');
+//     const [value, setValue] = useState(0);
+
+//     // Function to handle dropdown value change
+//     const handleDropdownChange = (event) => {
+//         setSelectedLLM(event.target.value);
+//     };
+
+//     const handleChange = (event, newValue) => {
+//         setValue(newValue);
+//     };
+
+//     // Memoized ChatInterface component
+//     const MemoizedChatInterface = useMemo(() => React.memo(ChatInterface), []);
+
+//     return (
+//         <div className="App">
+//             <meta name="viewport" content="initial-scale=1, width=device-width" />
+
+//             <Box sx={{ width: '100%' }}>
+//                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+//                     <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+//                         <Tab label="Upload file" />
+//                         <Tab label="Enter url" />
+//                         <Tab label="Input text" />
+//                     </Tabs>
+
+//                     <Box sx={{ minWidth: 120, marginTop: 5 }}>
+//                         <FormControl fullWidth>
+//                             <InputLabel id="demo-simple-select-label">LLM</InputLabel>
+//                             <Select
+//                                 labelId="demo-simple-select-label"
+//                                 id="demo-simple-select"
+//                                 value={selectedLLM}
+//                                 label="LLM"
+//                                 onChange={handleDropdownChange}
+//                             >
+//                                 <MenuItem value={"JinaChat"}>JinaChat</MenuItem>
+//                                 <MenuItem value={"Cohere"}>Cohere</MenuItem>
+//                                 <MenuItem value={"OpenAI"}>OpenAI</MenuItem>
+//                             </Select>
+//                         </FormControl>
+//                     </Box>
+
+//                 </Box>
+//                 <Box sx={{ p: 3 }}>
+//                     {value === 0 && <FileUpload />}
+//                     {value === 1 && <AddUrl />}
+//                     {value === 2 && <AddText />}
+//                     <MemoizedChatInterface tab={value} llmName={selectedLLM} />
+//                 </Box>
+//             </Box>
+//         </div>
+//     );
+// }
+
+// export default App;
+
+

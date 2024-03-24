@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Button, TextareaAutosize, Card, CardContent, Box, Snackbar } from '@mui/material';
+import { Button, TextareaAutosize, Card, CardContent, Box, Snackbar, Tooltip } from '@mui/material';
 
 const AddText = () => {
   const [text_str, setText_str] = useState('');
@@ -30,7 +30,7 @@ const AddText = () => {
   };
 
   return (
-    <Card sx={{ maxWidth: '50vh', minHeight: '10vh', maxHeight: '80vh', marginBottom:'5vh' }}>
+    <Card sx={{ maxWidth: '50vh', minHeight: '10vh', maxHeight: '80vh', marginBottom:'5vh', textAlign:'center' }}>
       <CardContent>
         <Box >
           {/* <label>Your text: </label> */}
@@ -41,7 +41,9 @@ const AddText = () => {
             value={text_str}
             onChange={(e) => setText_str(e.target.value)}
           />
-          <Button sx={{ marginLeft:'5vh' }} variant="outlined" size="small" onClick={handleAdd}>Add</Button>
+          <Tooltip title="Paste or type some text">
+            <Button sx={{ marginLeft:'5vh' }} variant="outlined" size="small" onClick={handleAdd}>Add</Button>
+          </Tooltip>
         </Box>
         <Snackbar
           anchorOrigin={{

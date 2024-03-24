@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Button, Input, Card, CardContent, Box, Snackbar } from '@mui/material';
+import { Button, Input, Card, CardContent, Box, Snackbar, Tooltip } from '@mui/material';
 
 const AddUrl = () => {
   const [url_str, setUrl_str] = useState('');
@@ -30,33 +29,35 @@ const AddUrl = () => {
   };
 
   return (
-    <Card sx={{ maxWidth: '50vh', minHeight: '10vh', maxHeight: '80vh', marginBottom:'5vh' }}>
-      <CardContent>
-        <Box>
-          <label>URL: </label>
-          <input
-            type="text"
-            value={url_str}
-            onChange={(e) => setUrl_str(e.target.value)}
+      <Card sx={{ maxWidth: '50vh', minHeight: '10vh', maxHeight: '80vh', marginBottom:'5vh', textAlign:'center' }}>
+        <CardContent>
+          <Box>
+            <label>URL: </label>
+            <input
+              type="text"
+              value={url_str}
+              onChange={(e) => setUrl_str(e.target.value)}
+            />
+            <Tooltip title="Add a URL with some text data">
+              <Button sx={{ marginLeft:'5vh' }} variant="outlined" size="small" onClick={handleAdd}>Add</Button>
+            </Tooltip>
+          </Box>
+          <Snackbar
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            open={openSnackbar}
+            autoHideDuration={6000}
+            onClose={handleCloseSnackbar}
+            message={snackbarMessage}
+            action={
+              <Button color="info" size="small" onClick={handleCloseSnackbar}>
+                Close
+              </Button>
+            }
           />
-          <Button sx={{ marginLeft:'5vh' }} variant="outlined" size="small" onClick={handleAdd}>Add</Button>
-        </Box>
-        <Snackbar
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          open={openSnackbar}
-          autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-          message={snackbarMessage}
-          action={
-            <Button color="info" size="small" onClick={handleCloseSnackbar}>
-              Close
-            </Button>
-          }
-        />
-      </CardContent>
+        </CardContent>
     </Card>
   );
 };
